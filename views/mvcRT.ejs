@@ -1,0 +1,34 @@
+<% layout('layout') -%>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th style="width:500px; "></th>
+            <th>
+                平均 <small>ms</small>
+            </th>
+            <th>
+                最小 <small>ms</small>
+            </th>
+            <th>
+                最大 <small>ms</small>
+            </th>
+
+        </tr>
+        </thead>
+        <tbody>
+        <% for(var i = 0;i < d.length;i++){
+            var key = d[i];
+            var h = l[i];
+        %>
+        <tr>
+            <th><code><%=i+1%></code> <%= key %></th>
+            <td><%= h['total']%></td>
+            <td><%= h['min'] %></td>
+            <td><%= h['max'] %></td>
+        </tr>
+        <% } %>
+        </tbody>
+    </table>
+</div>
