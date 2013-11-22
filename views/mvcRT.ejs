@@ -14,6 +14,12 @@
             <th>
                 最大 <small>ms</small>
             </th>
+            <th>
+                调用次数
+            </th>
+            <th>
+                TICK
+            </th>
 
         </tr>
         </thead>
@@ -27,6 +33,8 @@
             <td><%= h['total']%></td>
             <td><%= h['min'] %></td>
             <td><%= h['max'] %></td>
+            <td><%= h['call'] %></td>
+            <td><%= h['time'] %></td>
         </tr>
         <% } %>
         </tbody>
