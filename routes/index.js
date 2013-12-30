@@ -9,6 +9,7 @@ var pool = mysql.createPool({
 });
 var query = function (sql, param, cb) {
     pool.getConnection(function (err, connection) {
+        console.log(connection);
         var q = connection.query(sql, param, function (err, rows) {
             if (cb != undefined) {
                 cb(err, rows);
