@@ -7,7 +7,7 @@ exports.index = function (req, res) {
 };
 
 exports.programRT = function (req, res) {
-    client.zrevrangebyscore(['programRT', 99999, 1,  'LIMIT', 0, 99999],
+    client.zrevrangebyscore(['programRT', 99999, 0,  'LIMIT', 0, 99999],
         function (err, data) {
             async.map(data, function (t, cb) {
                 client.hgetall('programRT' + t, function (err, d) {
@@ -21,7 +21,7 @@ exports.programRT = function (req, res) {
 };
 
 exports.mvcRT = function (req, res) {
-    client.zrevrangebyscore(['mvcRT', 99999, 1,  'LIMIT', 0, 99999],
+    client.zrevrangebyscore(['mvcRT', 99999, 0,  'LIMIT', 0, 99999],
         function (err, data) {
             async.map(data, function (t, cb) {
                 client.hgetall('mvcRT' + t, function (err, d) {
