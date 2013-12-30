@@ -4,7 +4,7 @@
     <table class="table table-bordered table-striped">
         <thead>
         <tr>
-            <th style="width:500px; "></th>
+            <th style="width:500px; ">5秒一次刷新</th>
             <th>
                 平均 <small>ms</small>
             </th>
@@ -30,7 +30,7 @@
         %>
         <tr>
             <th><code><%=i+1%></code></code> <%= key %></th>
-            <td><%= h['total']%></td>
+            <td><%= h['avg']%></td>
             <td><%= h['min'] %></td>
             <td><%= h['max'] %></td>
             <td><%= h['call'] %></td>
@@ -40,3 +40,6 @@
         </tbody>
     </table>
 </div>
+<script>
+    window.setInterval(" location.reload() ",5000)
+</script>
