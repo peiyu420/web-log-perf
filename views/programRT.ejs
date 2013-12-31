@@ -1,21 +1,17 @@
 <% layout('layout') -%>
+<div class="btn-group-vertical" style="position: absolute; top:50; left: 3px;z-index:10000;">
+    <button type="button" onclick="sort='avg';mainData(1);" class="btn btn-default">avg</button>
+    <button type="button" onclick="sort='call';mainData(1);" class="btn btn-default">call</button>
+    <button type="button" onclick="sort='min';mainData(1);" class="btn btn-default">min</button>
+    <button type="button" onclick="sort='max';mainData(1);" class="btn btn-default">max</button>
+    <button type="button" onclick="sort='key';mainData(1);" class="btn btn-default">key</button>
 
-
-<div class="row show-grid">
-    <% for(var i = 0;i < d.length;i++){
-        var key = d[i];
-        var h = l[i];
-    %>
-    <div class="col-md-3">
-        <h6><%= key %></h6>
-        <p class="text-left text-primary">最小.<%=h["min"]%>   最大.<%=h["max"]%>   平均.<%=h["avg"]%> 调用.<%=h["call"]%></p>
-        <p id="<%= key.replace(" ","") %>" class="text-left"></p>
-    </div>
-    <%}%>
+</div>
+<div id="c" class="row show-grid">
 </div>
 <script>
-   var keys = '<%=d%>';
-   function charts(){
+    var sort = "call";
+   function charts(keys){
        $.get("cd",{keys:keys},function(data){
            for(var k in data.l){
                var el = $("#"+ k);
@@ -23,6 +19,34 @@
            }
        })
    }
-   charts();
-   window.setInterval("charts() ",3000)
+   function mainData(clear){
+       var cel = $("#c");
+       if(clear==1){
+           cel.html("");
+       }
+       var arrKey = new Array();
+       $.get("md",{k:"programRT",s:sort},function(data){
+           for(var t in data.l){
+               var i = data.l[t];
+               arrKey.push(i.key);
+               var id =i.key.replace(" ", "");
+               var icel = $('#c'+id);
+               if(icel.length<=0)
+               {
+                   cel.append('<div id="'+'c'+id+'" class="col-md-3"></div>');
+                   icel = $('#c'+id);
+                   icel.html('<h6>'+ i.key+'</h6>'+
+                           '<p class="text-left text-primary">最小.'+ i.min+' 最大.'+ i.max+' 平均.'+ i.avg+'调用.'+ i.call+'</p>'+
+                           '<p style="height: 40px;" id="'+ id+'" class="text-left"></p>');
+               }
+               else{
+                   $("p:first",icel).html('最小.'+ i.min+' 最大.'+ i.max+' 平均.'+ i.avg+'调用.'+ i.call);
+               }
+           }
+           charts(arrKey.join(','));
+       })
+
+   }
+   mainData()
+   window.setInterval(" mainData() ",3000)
 </script>
