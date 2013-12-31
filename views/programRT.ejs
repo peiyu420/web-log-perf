@@ -1,24 +1,6 @@
 <% layout('layout') -%>
 
-<style>
-    .show-grid {
-        margin-bottom: 3px;
-    }
-    .show-grid [class^="col-"] {
-        padding-top: 5px;
-        padding-bottom: 5px;
-        background-color: #fff;
-        border: 1px solid #ccc;
-    }
-    .col-md-2{
-        height:145px;
-    }
-    .col-md-2 h6{
-        height:13px;
-        overflow: hidden;
-    }
 
-</style>
 <div class="row show-grid">
     <% for(var i = 0;i < d.length;i++){
         var key = d[i];
@@ -37,12 +19,10 @@
        $.get("cd",{keys:keys},function(data){
            for(var k in data.l){
                var el = $("#"+ k);
-               try{el.sparkline(data.l[k],{height:30})}
-               catch(e){console.log(e)}
-
+               el.sparkline(data.l[k],{height:50,type: 'bar',barWidth:2.5,'barColor':'#FF6600','tooltipClassname':'tip'})
            }
        })
    }
    charts();
-   window.setInterval(" location.reload() ",5000)
+   window.setInterval("charts() ",3000)
 </script>

@@ -1,42 +1,27 @@
 <% layout('layout') -%>
 
-<div class="table-responsive">
-    <table class="table table-bordered table-striped">
-        <thead>
-        <tr>
-            <th style="width:500px; "></th>
-            <th>
-                平均 <small>ms</small>
-            </th>
-            <th>
-                最小 <small>ms</small>
-            </th>
-            <th>
-                最大 <small>ms</small>
-            </th>
-            <th>
-                调用次数
-            </th>
-            <th>
-                TICK
-            </th>
-
-        </tr>
-        </thead>
-        <tbody>
-        <% for(var i = 0;i < d.length;i++){
-            var key = d[i];
-            var h = l[i];
-        %>
-        <tr>
-            <th><code><%=i+1%></code> <%= key %></th>
-            <td><%= h['total']%></td>
-            <td><%= h['min'] %></td>
-            <td><%= h['max'] %></td>
-            <td><%= h['call'] %></td>
-            <td><%= h['time'] %></td>
-        </tr>
-        <% } %>
-        </tbody>
-    </table>
+<div class="row show-grid">
+    <% for(var i = 0;i < d.length;i++){
+        var key = d[i];
+        var h = l[i];
+    %>
+    <div class="col-md-3">
+        <h6><%= key %></h6>
+        <p class="text-left text-primary">最小.<%=h["min"]%>   最大.<%=h["max"]%>   平均.<%=h["avg"]%> 调用.<%=h["call"]%></p>
+        <p id="<%= key.replace(" ","") %>" class="text-left"></p>
+    </div>
+    <%}%>
 </div>
+<script>
+    var keys = '<%=d%>';
+    function charts(){
+        $.get("cd",{keys:keys},function(data){
+            for(var k in data.l){
+                var el = $("#"+ k);
+                el.sparkline(data.l[k],{height:50,type: 'bar',barWidth:2.5,'barColor':'#FF6600','tooltipClassname':'tip'})
+            }
+        })
+    }
+    charts();
+    window.setInterval("charts() ",3000)
+</script>
