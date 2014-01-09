@@ -16,7 +16,7 @@ var query = function (sql, param, cb) {
             }
             connection.release();
         });
-        console.log(q.sql);
+        //console.log(q.sql);
     });
 }
 
