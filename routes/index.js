@@ -120,7 +120,7 @@ exports.maxCall = function (req, res) {
     var key = req.query.key;
     var date = req.query.date;
 
-    var sql = "select `fun`,`duration` from perf.`perf-maxCall` where `key`=? and `date` = (select `date` from  perf.`perf-maxCall` where `key`=? and `date` <= ? order by `date` desc limit 1);";
+    var sql = "select `fun`,`duration` from perf.`perf-maxCall` where `key`=? and `date` = (select `date` from  perf.`perf-maxCall` where `key`=? and `date` <= ? order by `date` desc limit 1) order by `duration` desc;";
     query(sql, [key, key, date], function (err, data) {
         if (err) {
             res.send(200, err);

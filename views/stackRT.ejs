@@ -14,7 +14,7 @@
     var keyDate = {};
     function charts(keys){
         $.get("cmd",{keys:keys},function(data){
-            keyDate = {};
+            //keyDate = {};
             for(var k in data.l){
                 var el = $("#"+ window.md5(k));
                 keyDate[k] = data.d[k];
