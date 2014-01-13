@@ -107,7 +107,7 @@ exports.chartMaxData = function (req, res) {
             var arr_d = new Array();
             for (var o in results[r].d) {
                 arr.push(results[r].d[o].max);
-                arr_d.push(comb.date.format(results[r].d[o].date, "yyyy-MM-dd k:m:s"));
+                arr_d.push(comb.date.format(results[r].d[o].date, "yyyy-MM-dd H:m:s"));
             }
             h[results[r].k.replace(" ", "")] = arr.reverse();
             d[results[r].k.replace(" ", "")] = arr_d.reverse();
