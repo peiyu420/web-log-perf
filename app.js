@@ -2,6 +2,7 @@
 
 var express = require('express');
 var routes = require('./routes');
+var stack = require('./routes/stack.js')
 var http = require('http');
 var path = require('path');
 var engine = require('ejs-locals');
@@ -26,15 +27,20 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
-app.get('/', routes.index);
+app.get('/', stack.stackRT);
 app.get('/prt', routes.programRT);
 app.get('/mvcrt', routes.mvcRT);
 app.get('/cd', routes.chartData);
-app.get('/cmd', routes.chartMaxData);
-app.get('/stack', routes.stackRT);
-app.get('/md', routes.mainData);
-app.get('/mc', routes.maxCall);
 
+
+app.get('/md', routes.mainData);
+
+
+app.get('/stack/cmd', stack.chartMaxData);
+app.get('/stack/md', stack.mainData);
+app.get('/stack/servers', stack.servers);
+app.get('/stack/mc', stack.maxCall);
+app.get('/stack', stack.stackRT);
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));

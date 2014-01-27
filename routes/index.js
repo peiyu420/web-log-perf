@@ -92,44 +92,6 @@ exports.chartData = function (req, res) {
     });
 };
 
-exports.chartMaxData = function (req, res) {
-    var keys = req.query.keys.split(",");
-    var sql = "select `max`,`date` from perf.perf where `key`=? order by `date` desc limit 90;";
-    async.map(keys, function (t, cb) {
-        query(sql, [t], function (err, data) {
-            cb(err, {k: t, d: data});
-        });
-    }, function (err, results) {
-        var h = {};
-        var d = {};
-        for (var r in results) {
-            var arr = new Array();
-            var arr_d = new Array();
-            for (var o in results[r].d) {
-                arr.push(results[r].d[o].max);
-                arr_d.push(comb.date.format(results[r].d[o].date, "yyyy-MM-dd H:m:s"));
-            }
-            h[results[r].k.replace(" ", "")] = arr.reverse();
-            d[results[r].k.replace(" ", "")] = arr_d.reverse();
-        }
-        res.send(200, { l: h, d: d });
-    });
-};
-
-exports.maxCall = function (req, res) {
-    var key = req.query.key;
-    var date = req.query.date;
-
-    var sql = "select `fun`,`duration` from perf.`perf-maxCall` where `key`=? and `date` = (select `date` from  perf.`perf-maxCall` where `key`=? and `date` <= ? order by `date` desc limit 1) order by `duration` desc;";
-    query(sql, [key, key, date], function (err, data) {
-        if (err) {
-            res.send(200, err);
-            return;
-        }
-        res.send(200, data);
-    });
-};
-
 exports.mvcRT = function (req, res) {
     client.zrevrangebyscore(['mvcRT', 99999, 0, 'LIMIT', 0, 99999],
         function (err, data) {
@@ -139,21 +101,6 @@ exports.mvcRT = function (req, res) {
                 });
             }, function (err, results) {
                 res.render('mvcRT', {  d: data, l: results });
-            });
-        }
-    )
-};
-
-
-exports.stackRT = function (req, res) {
-    client.zrevrangebyscore(['stackRT', 99999, 0, 'LIMIT', 0, 99999],
-        function (err, data) {
-            async.map(data, function (t, cb) {
-                client.hgetall('stackRT' + t, function (err, d) {
-                    cb(err, d);
-                });
-            }, function (err, results) {
-                res.render('stackRT', {  d: data, l: results });
             });
         }
     )

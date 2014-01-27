@@ -6,32 +6,50 @@
     <button type="button" onclick="sort='min';mainData(1);" class="btn btn-default">min</button>
     <button type="button" onclick="sort='max';mainData(1);" class="btn btn-default">max</button>
     <button type="button" onclick="sort='key';mainData(1);" class="btn btn-default">key</button>
+    <div class="btn-group">
+        <button class="btn btn-default btn-xs dropdown-toggle" type="button" data-toggle="dropdown">
+            server <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+            <% for(var i = 0; i < servers.length;i++){ %>
+            <li><a href="javascript:selectServer('<%= servers[i] %>')"><%= servers[i] %></a></li>
+            <% } %>
+        </ul>
+    </div>
 </div>
+
 <div id="c" class="row show-grid">
+</div>
+<div class="btn-group">
+
 </div>
 <script>
     var sort = "call";
     var keyDate = {};
-    function charts(keys){
-        $.get("cmd",{keys:keys},function(data){
+    var server = "<%=server%>";
+    function selectServer(s) {
+        server = s;
+        mainData(1);
+    }
+    function charts(keys) {
+        $.get("/stack/cmd", {keys: keys, server: server}, function (data) {
             //keyDate = {};
-            for(var k in data.l){
-                var el = $("#"+ window.md5(k));
+            for (var k in data.l) {
+                var el = $("#" + window.md5(k));
                 keyDate[k] = data.d[k];
-                el.sparkline(data.l[k],{height:50,barWidth:2.5,'barColor':'#FF6600','tooltipClassname':'tip'})
+                el.sparkline(data.l[k], {height: 50, barWidth: 2.5, 'barColor': '#FF6600', 'tooltipClassname': 'tip'})
                 el.unbind();
-                el.attr("k",k);
-                el.bind('sparklineClick', function(ev) {
+                el.attr("k", k);
+                el.bind('sparklineClick', function (ev) {
                     var sparkline = ev.sparklines[0],
-                    r = sparkline.getCurrentRegionFields();
+                            r = sparkline.getCurrentRegionFields();
                     var k = $(this).attr("k");
                     var d = keyDate[k][r.x];
-                    $.get("/mc",{key:k,date:d},function(data){
+                    $.get("/stack/mc", {key: k, date: d, server: server}, function (data) {
                         var r = "";
-                        for(var i in data)
-                        {
+                        for (var i in data) {
                             var t = data[i];
-                            r+= t["fun"]+":"+t["duration"]+"\n";
+                            r += t["fun"] + ":" + t["duration"] + "\n";
                         }
                         alert(r);
                     })
@@ -40,28 +58,27 @@
         })
     }
 
-    function mainData(clear){
+    function mainData(clear) {
         var cel = $("#c");
-        if(clear==1){
+        if (clear == 1) {
             cel.html("");
         }
         var arrKey = new Array();
-        $.get("md",{k:"stackRT",s:sort},function(data){
-            for(var t in data.l){
+        $.get("/stack/md", {k: "stackRT", s: sort, server: server}, function (data) {
+            for (var t in data.l) {
                 var i = data.l[t];
                 arrKey.push(i.key);
-                var id =window.md5(i.key.replace(" ", ""));
-                var icel = $('#c'+id);
-                if(icel.length<=0)
-                {
-                    cel.append('<div id="'+'c'+id+'" class="col-md-3"></div>');
-                    icel = $('#c'+id);
-                    icel.html('<h6  style="width: 255px; overflow: hidden; height: 15px;">'+ i.key+'</h6>'+
-                            '<p class="text-left text-primary">最小.'+ i.min+' 最大.'+ i.max+' 平均.'+ i.avg+'调用.'+ i.call+'</p>'+
-                            '<p style="height: 40px;" id="'+ id+'" class="text-left"></p>');
+                var id = window.md5(i.key.replace(" ", ""));
+                var icel = $('#c' + id);
+                if (icel.length <= 0) {
+                    cel.append('<div id="' + 'c' + id + '" class="col-md-3"></div>');
+                    icel = $('#c' + id);
+                    icel.html('<h6  style="width: 255px; overflow: hidden; height: 15px;">' + i.key + '</h6>' +
+                            '<p class="text-left text-primary">最小.' + i.min + ' 最大.' + i.max + ' 平均.' + i.avg + '调用.' + i.call + '</p>' +
+                            '<p style="height: 40px;" id="' + id + '" class="text-left"></p>');
                 }
-                else{
-                    $("p:first",icel).html('最小.'+ i.min+' 最大.'+ i.max+' 平均.'+ i.avg+'调用.'+ i.call);
+                else {
+                    $("p:first", icel).html('最小.' + i.min + ' 最大.' + i.max + ' 平均.' + i.avg + '调用.' + i.call);
                 }
             }
             charts(arrKey.join(','));
@@ -69,5 +86,5 @@
 
     }
     mainData()
-    window.setInterval(" mainData() ",15000)
+    window.setInterval(" mainData() ", 15000)
 </script>
