@@ -1,6 +1,6 @@
 var async = require("async"),
     redis = require("redis"), comb = require("comb"),
-    client = redis.createClient(6379, '192.168.8.48'), mysql = require('mysql');
+    client = redis.createClient(6379, '192.168.8.44'), mysql = require('mysql');
 
 var pool = mysql.createPool({
     host: '192.168.8.44',
@@ -105,3 +105,26 @@ exports.mvcRT = function (req, res) {
         }
     )
 };
+
+exports.groupIP = function (req, res) {
+    client.zrevrangebyscore(['group:nginx:ip', 99999, 0, 'LIMIT', 0, 99999, 'WITHSCORES'],
+        function (err, data) {
+            res.render('groupIP', { d: data });
+        }
+    )
+}
+exports.groupUA = function (req, res) {
+    client.zrevrangebyscore(['group:nginx:ua', 99999, 0, 'LIMIT', 0, 99999, 'WITHSCORES'],
+        function (err, data) {
+            res.render('groupUA', { d: data });
+        }
+    )
+}
+
+exports.groupReferer = function (req, res) {
+    client.zrevrangebyscore(['group:nginx:referer', 99999, 0, 'LIMIT', 0, 99999, 'WITHSCORES'],
+        function (err, data) {
+            res.render('groupReferer', { d: data });
+        }
+    )
+}

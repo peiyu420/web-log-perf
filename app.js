@@ -34,7 +34,9 @@ app.get('/cd', routes.chartData);
 
 
 app.get('/md', routes.mainData);
-
+app.get('/groupIP', routes.groupIP);
+app.get('/groupUA', routes.groupUA);
+app.get('/groupReferer', routes.groupReferer);
 
 app.get('/stack/cmd', stack.chartMaxData);
 app.get('/stack/md', stack.mainData);

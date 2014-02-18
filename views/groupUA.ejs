@@ -1,0 +1,12 @@
+<% layout('layout') -%>
+<style type="text/css">
+  .list-group-item{ float:left; width: 350px; height: 90px;}
+</style>
+<div id="c" class="row show-grid">
+    <ul class="list-group">
+    <% for(var i = 0; i < d.length;i+=2){ %>
+        <li class="list-group-item"><span class="badge"><%=d[i+1]%></span><a href="http://www.baidu.com/s?wd=<%=d[i]%>" target="_blank"><%=d[i]%></a></li>
+    <%
+    }%>
+    </ul>
+</div>

@@ -3,7 +3,7 @@
  */
 var async = require("async"),
     redis = require("redis"), comb = require("comb"),
-    client = redis.createClient(6379, '192.168.8.48'), mysql = require('mysql');
+    client = redis.createClient(6379, '192.168.8.44'), mysql = require('mysql');
 
 var pool = mysql.createPool({
     host: '192.168.8.44',
