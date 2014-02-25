@@ -20,8 +20,8 @@
 
 <div id="c" class="row show-grid">
 </div>
-<div class="btn-group">
 
+<div class="btn-group">
 </div>
 <script>
     var sort = "call";
@@ -45,13 +45,18 @@
                             r = sparkline.getCurrentRegionFields();
                     var k = $(this).attr("k");
                     var d = keyDate[k][r.x];
-                    $.get("/stack/mc", {key: k, date: d, server: server}, function (data) {
-                        var r = "";
+                    $.get("/stack/mc", {key: k, date: d, server: server}, function (d) {
+                        var r = "<div style='padding: 10px; font-size: 12px;'>";
+                        r+= d['maxUrl']+" "+d['date']+"<br/>"
+                        var data = d['data']
                         for (var i in data) {
                             var t = data[i];
-                            r += t["fun"] + ":" + t["duration"] + "\n";
+                            r += t["fun"] + ":" + t["duration"]+"</br>";
                         }
-                        alert(r);
+                        r+="</div>"
+
+
+                        alertify.alert(r);
                     })
                 });
             }
@@ -87,4 +92,5 @@
     }
     mainData()
     window.setInterval(" mainData() ", 15000)
+
 </script>

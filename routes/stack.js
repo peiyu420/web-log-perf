@@ -124,13 +124,28 @@ exports.maxCall = function (req, res) {
     var date = req.query.date;
     var server = req.query.server;
     var sql = "select `fun`,`duration` from perf.`perf-maxCall` where `key`=? and `server`=? and `date` = (select `date` from  perf.`perf-maxCall` where `key`=? and `server`=? and `date` <= ? order by `date` desc limit 1) order by `duration` desc;";
-    query(sql, [key, server, key, server, date], function (err, data) {
-        if (err) {
-            res.send(200, err);
-            return;
-        }
-        res.send(200, data);
-    });
+    var sql2 = "select `maxUrl` from perf.`perf-stack` where  `key`=? and `server`=? and `date`=?"
+
+    async.series([function (cb) {
+        query(sql, [key, server, key, server, date], function (err, data) {
+            if (err) {
+                cb(err, null);
+                return;
+            }
+            cb(null, data);
+        });
+    }, function (cb) {
+        query(sql2, [ key, server, date], function (err, data) {
+            if (err) {
+                cb(err, null);
+                return;
+            }
+            cb(null, data);
+        });
+    }], function (err, results) {
+        var d = {data: results[0],maxUrl:results[1][0]['maxUrl'], date: date };
+        res.send(200, d);
+    })
 };
 
 exports.stackRT = function (req, res) {
