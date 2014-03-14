@@ -1,6 +1,3 @@
-/**
- * Created by Neher on 14-1-27.
- */
 var async = require("async"),
     redis = require("redis"), comb = require("comb"),
     client = redis.createClient(6379, '192.168.8.44'), mysql = require('mysql');
@@ -25,16 +22,16 @@ var query = function (sql, param, cb) {
 var print = function (data) {
 }
 var getServers = function (cb) {
-    client.smembers(['stack_server'],
+    client.smembers(['carBiz_server'],
         function (err, data) {
             if (data == null || data.length <= 0) {
-                var sql = 'select `server` from perf.`perf-stack` group by `server`;';
+                var sql = 'select `server` from perf.`perf-general` group by `server`;';
                 var data = new Array();
                 query(sql, null, function (err, d) {
                     for (var i in d) {
                         data.push(d[i].server)
                     }
-                    client.sadd('stack_server', data, print);
+                    client.sadd('carBiz_server', data, print);
                     cb(data);
                 });
             }
@@ -48,12 +45,34 @@ exports.servers = function (req, res) {
     getServers(function (data) {
         res.send(200, {servers: data});
     })
-
+}
+exports.carBizRT = function (req, res) {
+    getServers(function (data) {
+        if (data != null && data.length > 0) {
+            var server = data[0];
+            var servers = data;
+            var key = 'GeneralRT' + server;
+            client.zrevrangebyscore([key, 99999, 0, 'LIMIT', 0, 99999],
+                function (err, data) {
+                    async.map(data, function (t, cb) {
+                        client.hgetall('GeneralRT' + server + t, function (err, d) {
+                            cb(err, d);
+                        });
+                    }, function (err, results) {
+                        res.render('carBiz', {  d: data, l: results, server: server, servers: servers });
+                    });
+                }
+            )
+        }
+        else {
+            res.render('carBiz', {server: []});
+        }
+    })
 }
 exports.chartMaxData = function (req, res) {
     var keys = req.query.keys.split(",");
     var server = req.query.server;
-    var sql = "select `max`,`date` from perf.`perf-stack` where `key`=? and  `server`=? order by `date` desc limit 90;";
+    var sql = "select `max`,`date` from perf.`perf-general` where `key`=? and  `server`=? order by `date` desc limit 90;";
 
     async.map(keys, function (t, cb) {
         query(sql, [t, server], function (err, data) {
@@ -117,57 +136,4 @@ exports.mainData = function (req, res) {
             });
         }
     )
-}
-
-exports.maxCall = function (req, res) {
-    var key = req.query.key;
-    var date = req.query.date;
-    var server = req.query.server;
-    var sql = "select `fun`,`duration` from perf.`perf-maxCall` where `key`=? and `server`=? and `date` = (select `date` from  perf.`perf-maxCall` where `key`=? and `server`=? and `date` <= ? order by `date` desc limit 1) order by `duration` desc;";
-    var sql2 = "select `maxUrl` from perf.`perf-stack` where  `key`=? and `server`=? and `date`=?"
-
-    async.series([function (cb) {
-        query(sql, [key, server, key, server, date], function (err, data) {
-            if (err) {
-                cb(err, null);
-                return;
-            }
-            cb(null, data);
-        });
-    }, function (cb) {
-        query(sql2, [ key, server, date], function (err, data) {
-            if (err) {
-                cb(err, null);
-                return;
-            }
-            cb(null, data);
-        });
-    }], function (err, results) {
-        var d = {data: results[0],maxUrl:results[1][0]['maxUrl'], date: date };
-        res.send(200, d);
-    })
-};
-
-exports.stackRT = function (req, res) {
-    getServers(function (data) {
-        if (data != null && data.length > 0) {
-            var server = data[0];
-            var servers = data;
-            var key = 'stackRT' + server;
-            client.zrevrangebyscore([key, 99999, 0, 'LIMIT', 0, 99999],
-                function (err, data) {
-                    async.map(data, function (t, cb) {
-                        client.hgetall('stackRT' + server + t, function (err, d) {
-                            cb(err, d);
-                        });
-                    }, function (err, results) {
-                        res.render('stackRT', {  d: data, l: results, server: server, servers: servers });
-                    });
-                }
-            )
-        }
-        else {
-            res.render('stackRT', {server: []});
-        }
-    })
 }

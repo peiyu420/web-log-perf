@@ -1,0 +1,85 @@
+<% layout('layout') -%>
+<style type="text/css">
+    .show-grid [class^="col-"] {
+        padding-top: 2px;
+        padding-bottom: 2px;
+        background-color: #fff;
+        border: 1px solid #ccc;
+    }
+</style>
+<script src="/javascripts/md5.js"></script>
+<div class="btn-group-vertical" style="position: absolute; top:50; left: 3px;z-index:10000;">
+    <button type="button" onclick="sort='avg';mainData(1);" class="btn btn-default">avg</button>
+    <button type="button" onclick="sort='call';mainData(1);" class="btn btn-default">call</button>
+    <button type="button" onclick="sort='min';mainData(1);" class="btn btn-default">min</button>
+    <button type="button" onclick="sort='max';mainData(1);" class="btn btn-default">max</button>
+    <button type="button" onclick="sort='key';mainData(1);" class="btn btn-default">key</button>
+    <div class="btn-group">
+        <button class="btn btn-default btn-xs dropdown-toggle" type="button" data-toggle="dropdown">
+            server <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+            <% for(var i = 0; i < servers.length;i++){ %>
+            <li><a href="javascript:selectServer('<%= servers[i] %>')"><%= servers[i] %></a></li>
+            <% } %>
+        </ul>
+    </div>
+</div>
+
+<div id="c" class="row show-grid">
+</div>
+<div class="btn-group">
+</div>
+<script type="application/javascript">
+    var sort = "call";
+    var keyDate = {};
+    var server = "<%=server%>";
+    function selectServer(s) {
+        server = s;
+        mainData(1);
+    }
+    function charts(keys) {
+        $.get("/carBiz/cmd", {keys: keys, server: server}, function (data) {
+            //keyDate = {};
+            for (var k in data.l) {
+                var el = $("#" + window.md5(k));
+                keyDate[k] = data.d[k];
+                el.sparkline(data.l[k], {height: 50, barWidth: 2.5, 'barColor': '#FF6600', 'tooltipClassname': 'tip'})
+                el.unbind();
+                el.attr("k", k);
+
+            }
+        })
+    }
+
+    function mainData(clear) {
+        var cel = $("#c");
+        if (clear == 1) {
+            cel.html("");
+        }
+        var arrKey = new Array();
+        $.get("/carBiz/md", {k: "GeneralRT", s: sort, server: server}, function (data) {
+            for (var t in data.l) {
+                var i = data.l[t];
+                arrKey.push(i.key);
+                var id = window.md5(i.key.replace(" ", ""));
+                var icel = $('#c' + id);
+                if (icel.length <= 0) {
+                    cel.append('<div id="' + 'c' + id + '" class="col-md-3"></div>');
+                    icel = $('#c' + id);
+                    icel.html('<h6  style="width: 270px; overflow: hidden; height: 25px;" title="'+ i.key+'">' + i.key + '</h6>' +
+                            '<p class="text-left text-primary" style="height:20px; overflow:hiden;">最小.' + i.min + ' 最大.' + i.max + ' 平均.' + i.avg + '调用.' + i.call + '</p>' +
+                            '<p style="height: 40px;" id="' + id + '" class="text-left"></p>');
+                }
+                else {
+                    $("p:first", icel).html('最小.' + i.min + ' 最大.' + i.max + ' 平均.' + i.avg + '调用.' + i.call);
+                }
+            }
+            charts(arrKey.join(','));
+        })
+
+    }
+    mainData()
+    window.setInterval(" mainData() ", 15000)
+
+</script>

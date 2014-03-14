@@ -2,7 +2,8 @@
 
 var express = require('express');
 var routes = require('./routes');
-var stack = require('./routes/stack.js')
+var stack = require('./routes/stack.js');
+var carBiz = require('./routes/carBiz.js');
 var http = require('http');
 var path = require('path');
 var engine = require('ejs-locals');
@@ -43,6 +44,11 @@ app.get('/stack/md', stack.mainData);
 app.get('/stack/servers', stack.servers);
 app.get('/stack/mc', stack.maxCall);
 app.get('/stack', stack.stackRT);
+
+app.get('/carBiz',carBiz.carBizRT);
+app.get('/carBiz/servers', carBiz.servers);
+app.get('/carBiz/md', carBiz.mainData);
+app.get('/carBiz/cmd', carBiz.chartMaxData);
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
