@@ -32,9 +32,10 @@ var getServers = function (cb) {
                 var data = new Array();
                 query(sql, null, function (err, d) {
                     for (var i in d) {
-                        if(d[i].server.indexOf('win')>=0)
+                        var server= d[i].server;
+                        if(server.indexOf('win')>=0)
                             data.push(d[i].server)
-                    } 
+                    }
                     client.sadd('stack_server', data, print);
                     cb(data);
                 });
