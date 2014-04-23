@@ -1,0 +1,69 @@
+<% layout('layout') -%>
+<style type="text/css">
+    .show-grid [class^="col-"] {
+        padding-top: 2px;
+        padding-bottom: 2px;
+        background-color: #fff;
+        border: 1px solid #ccc;
+    }
+</style>
+
+<div id="c" class="row show-grid">
+</div>
+<div class="btn-group">
+</div>
+<script type="application/javascript">
+    var sort = "call";
+    var keyDate = {};
+
+    function charts(keys) {
+        $.get("/nginxSupervisory/chart", {keys: keys}, function (data) {
+            for (var k in data.l) {
+                var el = $("#" + k);
+                var color = el.attr("alt");
+
+                el.sparkline(data.l[k], {height: 50,type: 'bar', barWidth: 2.5, 'barColor': color, 'tooltipClassname': 'tip'})
+                el.unbind();
+                el.attr("k", k);
+
+            }
+        })
+    }
+    function mainData(clear) {
+        var cel = $("#c");
+        if (clear == 1) {
+            cel.html("");
+        }
+        var arrKey = new Array();
+        $.get("/nginxSupervisory/data", function (data) {
+            var d = data.d;
+            var l = data.l;
+            for (var i = 0; i < d.length; i++) {
+                var k = d[i];
+                var item = l[i];
+                arrKey.push(k);
+
+                var icel = $('#c' + k);
+                if (icel.length <= 0) {
+                    cel.append('<div id="' + 'c' + k + '" class="col-md-3"></div>');
+                    icel = $('#c' + k);
+                    icel.html('<h6  style="width: 270px; overflow: hidden; height: 25px;" title="' + k + '">' + k.toUpperCase() + ' <a>历史</a></h6>' +
+                            ' <p class="text-left text-primary" style="height:20px; overflow:hiden;"> 最小.' + item.min + ' 最大.'
+                            + item.max + ' 平均.' + item.avg + '调用.' + item.call + '</p>' +
+                            '<span class="label label-success">最大RT</span><p style="height: 50px; margin-top: 3px;" alt="#5cb85c" id="' + k + '_max" class="text-left"></p>' +
+                            '<span class="label label-danger">平均RT</span><p style="height: 50px; margin-top: 3px;" alt="#d9534f" id="' + k + '_avg" class="text-left"></p>'+
+                            '<span class="label label-primary">调用次数</span><p style="height: 50px; margin-top: 3px;" alt="#428bca" id="' + k + '_call" class="text-left"></p>');
+                }
+                else {
+                    $("p:first", icel).html('最小.' + item.min + ' 最大.' + item.max + ' 平均.' + item.avg + '调用.' + item.call);
+                }
+            }
+            charts(arrKey.join(','));
+        })
+
+
+    }
+    mainData()
+    window.setInterval(" mainData() ", 5000)
+
+</script>
