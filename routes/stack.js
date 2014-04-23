@@ -34,7 +34,7 @@ var getServers = function (cb) {
                     for (var i in d) {
                         if(d[i].server.indexOf('win')>=0)
                             data.push(d[i].server)
-                    }
+                    } 
                     client.sadd('stack_server', data, print);
                     cb(data);
                 });
